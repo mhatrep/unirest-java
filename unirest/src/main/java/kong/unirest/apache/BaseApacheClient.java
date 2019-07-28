@@ -26,10 +26,10 @@
 package kong.unirest.apache;
 
 import kong.unirest.*;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.CredentialsProvider;
-import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.hc.client5.http.auth.AuthScope;
+import org.apache.hc.client5.http.auth.CredentialsProvider;
+import org.apache.hc.client5.http.auth.UsernamePasswordCredentials;
+import org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider;
 
 import java.util.function.Function;
 
@@ -40,9 +40,9 @@ abstract class BaseApacheClient {
 
     protected CredentialsProvider toApacheCreds(Proxy proxy) {
         if(proxy != null && proxy.isAuthenticated()) {
-            CredentialsProvider proxyCreds = new BasicCredentialsProvider();
+            BasicCredentialsProvider proxyCreds = new BasicCredentialsProvider();
             proxyCreds.setCredentials(new AuthScope(proxy.getHost(), proxy.getPort()),
-                    new UsernamePasswordCredentials(proxy.getUsername(), proxy.getPassword()));
+                    new UsernamePasswordCredentials(proxy.getUsername(), proxy.getPassword().toCharArray()));
             return proxyCreds;
         }
         return null;

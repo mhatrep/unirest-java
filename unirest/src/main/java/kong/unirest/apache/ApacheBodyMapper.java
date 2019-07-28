@@ -26,16 +26,14 @@
 package kong.unirest.apache;
 
 import kong.unirest.*;
-import org.apache.http.HttpEntity;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.entity.BasicHttpEntity;
-import org.apache.http.entity.ByteArrayEntity;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.entity.mime.HttpMultipartMode;
-import org.apache.http.entity.mime.MultipartEntityBuilder;
-import org.apache.http.entity.mime.content.*;
-import org.apache.http.message.BasicNameValuePair;
+import org.apache.hc.client5.http.entity.UrlEncodedFormEntity;
+import org.apache.hc.client5.http.entity.mime.*;
+import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.core5.http.NameValuePair;
+import org.apache.hc.core5.http.io.entity.BasicHttpEntity;
+import org.apache.hc.core5.http.io.entity.ByteArrayEntity;
+import org.apache.hc.core5.http.io.entity.StringEntity;
+import org.apache.hc.core5.http.message.BasicNameValuePair;
 
 import java.io.File;
 import java.io.InputStream;
@@ -55,7 +53,7 @@ class ApacheBodyMapper {
 
     HttpEntity apply() {
         Optional<Body> body = request.getBody();
-        return body.map(this::applyBody).orElseGet(BasicHttpEntity::new);
+        return body.map(this::applyBody).orElseGet(() -> new StringEntity(""));
 
     }
 
@@ -74,7 +72,7 @@ class ApacheBodyMapper {
         } else if(String.class.isAssignableFrom(bodyPart.getPartType())){
             return new StringEntity((String) bodyPart.getValue(), b.getCharset());
         } else {
-            return new ByteArrayEntity((byte[])bodyPart.getValue());
+            return new ByteArrayEntity((byte[])bodyPart.getValue(), toApacheType(bodyPart.getContentType()));
         }
     }
 
@@ -135,8 +133,8 @@ class ApacheBodyMapper {
         return cls.isAssignableFrom(value.getPartType());
     }
 
-    private org.apache.http.entity.ContentType toApacheType(String type) {
-        return org.apache.http.entity.ContentType.parse(type);
+    private org.apache.hc.core5.http.ContentType toApacheType(String type) {
+        return org.apache.hc.core5.http.ContentType.parse(type);
     }
 
     static List<NameValuePair> getList(Collection<BodyPart> parameters) {

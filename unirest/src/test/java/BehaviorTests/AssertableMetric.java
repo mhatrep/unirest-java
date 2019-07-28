@@ -23,18 +23,20 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package kong.unirest.apache;
+package BehaviorTests;
 
-import org.apache.hc.core5.http.message.BasicClassicHttpRequest;
+import kong.unirest.HttpRequestSummary;
+import kong.unirest.MetricContext;
+import kong.unirest.UniMetric;
 
-class ApachePatchWithBody extends BasicClassicHttpRequest {
-	private static final String METHOD_NAME = "PATCH";
-
-	public String getMethod() {
-		return METHOD_NAME;
-	}
-
-	ApachePatchWithBody(final String uri) {
-		super(METHOD_NAME, uri);
-	}
+public class AssertableMetric implements UniMetric {
+    public static boolean expectSuccess = true;
+    @Override
+    public MetricContext begin(HttpRequestSummary request) {
+        return (h,e)  -> {
+            if(expectSuccess && (h.getStatus() > 400)){
+                throw new AssertionError("Expected Success but was " + h.getStatus());
+            }
+        };
+    }
 }

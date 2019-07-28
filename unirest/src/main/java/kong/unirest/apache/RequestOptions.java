@@ -27,8 +27,12 @@ package kong.unirest.apache;
 
 import kong.unirest.Config;
 import kong.unirest.Proxy;
-import org.apache.http.HttpHost;
-import org.apache.http.client.config.RequestConfig;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.core5.http.HttpHost;
+import org.apache.hc.core5.util.Timeout;
+
+import java.util.concurrent.TimeUnit;
+
 
 class RequestOptions {
     static RequestConfig toRequestConfig(Config config) {
@@ -36,9 +40,9 @@ class RequestOptions {
         Integer socketTimeout = config.getSocketTimeout();
         HttpHost proxy = toApacheProxy(config.getProxy());
         return RequestConfig.custom()
-                .setConnectTimeout(connectionTimeout)
-                .setSocketTimeout(socketTimeout)
-                .setConnectionRequestTimeout(socketTimeout)
+                .setConnectTimeout(Timeout.of(connectionTimeout, TimeUnit.MILLISECONDS))
+                //.setSocketTimeout(socketTimeout)
+                .setConnectionRequestTimeout(Timeout.of(socketTimeout, TimeUnit.MILLISECONDS))
                 .setProxy(proxy)
                 .build();
     }

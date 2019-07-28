@@ -26,19 +26,10 @@
 package kong.unirest.apache;
 
 import kong.unirest.HttpMethod;
-import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
+import org.apache.hc.core5.http.message.BasicClassicHttpRequest;
 
-import java.net.URI;
-
-class ApacheRequestWithBody extends HttpEntityEnclosingRequestBase {
-    private HttpMethod method;
-
+class ApacheRequestWithBody extends BasicClassicHttpRequest {
     public ApacheRequestWithBody(HttpMethod method, String uri){
-        this.method = method;
-        setURI(URI.create(uri));
-    }
-    @Override
-    public String getMethod() {
-        return method.name();
+        super(method.name(), uri);
     }
 }

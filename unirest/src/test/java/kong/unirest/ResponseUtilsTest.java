@@ -83,7 +83,7 @@ public class ResponseUtilsTest {
         public String type;
 
         protected TestResponse(Config config) {
-            super(config);
+            super(null, config);
         }
 
         @Override

@@ -27,9 +27,9 @@ package kong.unirest;
 
 import kong.unirest.apache.ApacheAsyncClient;
 import kong.unirest.apache.ApacheClient;
-import org.apache.http.HttpRequestInterceptor;
-import org.apache.http.client.HttpClient;
-import org.apache.http.nio.client.HttpAsyncClient;
+import org.apache.hc.client5.http.async.HttpAsyncClient;
+import org.apache.hc.client5.http.classic.HttpClient;
+import org.apache.hc.core5.http.HttpRequestInterceptor;
 
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -107,17 +107,6 @@ public class Config {
         }
     }
 
-    /**
-     * Set the HttpClient implementation to use for every synchronous request
-     *
-     * @param httpClient Custom httpClient implementation
-     * @return this config object
-     */
-    @Deprecated // use httpClient(Function<Config, Client> httpClient) with the ApacheConfig.builder()
-    public Config httpClient(HttpClient httpClient) {
-        client = Optional.of(new ApacheClient(httpClient, this, null, null));
-        return this;
-    }
 
     /**
      * Set the HttpClient implementation to use for every synchronous request
@@ -141,16 +130,6 @@ public class Config {
         return this;
     }
 
-    /**
-     * Set the asynchronous AbstractHttpAsyncClient implementation to use for every asynchronous request
-     *
-     * @param value Custom CloseableHttpAsyncClient implementation
-     * @return this config object
-     */
-    public Config asyncClient(HttpAsyncClient value) {
-        this.asyncClient = Optional.of(new ApacheAsyncClient(value, this, null, null));
-        return this;
-    }
 
     /**
      * Set the full async configuration including monitors. These will be shutDown on a Unirest.shudown()

@@ -27,21 +27,22 @@ package BehaviorTests;
 
 import kong.unirest.TestUtil;
 import kong.unirest.Unirest;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.config.Registry;
-import org.apache.http.config.RegistryBuilder;
-import org.apache.http.conn.socket.ConnectionSocketFactory;
-import org.apache.http.conn.socket.PlainConnectionSocketFactory;
-import org.apache.http.conn.ssl.NoopHostnameVerifier;
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
-import org.apache.http.ssl.SSLContexts;
-import org.apache.http.util.EntityUtils;
+import org.apache.hc.client5.http.classic.HttpClient;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
+import org.apache.hc.client5.http.socket.ConnectionSocketFactory;
+import org.apache.hc.client5.http.socket.PlainConnectionSocketFactory;
+import org.apache.hc.client5.http.ssl.NoopHostnameVerifier;
+import org.apache.hc.client5.http.ssl.SSLConnectionSocketFactory;
+import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.core5.http.HttpResponse;
+import org.apache.hc.core5.http.config.Registry;
+import org.apache.hc.core5.http.config.RegistryBuilder;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.ssl.SSLContexts;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -49,8 +50,6 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLHandshakeException;
 import javax.net.ssl.SSLPeerUnverifiedException;
 
-import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.security.KeyStore;
 
@@ -85,14 +84,13 @@ public class CertificateTests extends BddTest {
                 .loadKeyMaterial(readStore(), "badssl.com".toCharArray()) // use null as second param if you don't have a separate key password
                 .build();
 
-        HttpClient httpClient = HttpClients.custom().setSSLContext(sslContext).build();
+        CloseableHttpClient httpClient = HttpClients.custom()
+                //.setSSLContext(sslContext)
+                .build();
 
-        HttpResponse response = httpClient.execute(new HttpGet("https://client.badssl.com/"));
-        assertEquals(200, response.getStatusLine().getStatusCode());
+        CloseableHttpResponse response = httpClient.execute(new HttpGet("https://client.badssl.com/"));
+        assertEquals(200, response.getCode());
         HttpEntity entity = response.getEntity();
-
-        System.out.println("----------------------------------------");
-        System.out.println(response.getStatusLine());
         EntityUtils.consume(entity);
     }
 
@@ -117,11 +115,11 @@ public class CertificateTests extends BddTest {
 
         CloseableHttpClient httpClient =
                 HttpClients.custom()
-                        .setSSLSocketFactory(sslSocketFactory)
+                       // .setSSLSocketFactory(sslSocketFactory)
                         .setConnectionManager(cm)
                         .build();
 
-        Unirest.config().httpClient(httpClient);
+        //Unirest.config().httpClient(httpClient);
 
         Unirest.get("https://client.badssl.com/")
                 .asString()

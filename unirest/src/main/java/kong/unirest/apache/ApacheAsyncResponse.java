@@ -25,16 +25,61 @@
 
 package kong.unirest.apache;
 
-import org.apache.hc.core5.http.message.BasicClassicHttpRequest;
+import kong.unirest.Config;
+import kong.unirest.Headers;
+import kong.unirest.RawResponseBase;
+import org.apache.hc.client5.http.async.methods.SimpleHttpResponse;
+import org.apache.hc.core5.http.HttpResponse;
 
-class ApachePatchWithBody extends BasicClassicHttpRequest {
-	private static final String METHOD_NAME = "PATCH";
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
-	public String getMethod() {
-		return METHOD_NAME;
-	}
+class ApacheAsyncResponse extends RawResponseBase {
 
-	ApachePatchWithBody(final String uri) {
-		super(METHOD_NAME, uri);
-	}
+    private final SimpleHttpResponse r;
+
+    ApacheAsyncResponse(SimpleHttpResponse r, Config config) {
+        super(r, config);
+        this.r = r;
+    }
+
+    @Override
+    public InputStream getContent() {
+        return null;
+    }
+
+    @Override
+    public byte[] getContentAsBytes() {
+        return new byte[0];
+    }
+
+    @Override
+    public String getContentAsString() {
+        return null;
+    }
+
+    @Override
+    public String getContentAsString(String charset) {
+        return null;
+    }
+
+    @Override
+    public InputStreamReader getContentReader() {
+        return null;
+    }
+
+    @Override
+    public boolean hasContent() {
+        return false;
+    }
+
+    @Override
+    public String getContentType() {
+        return null;
+    }
+
+    @Override
+    public String getEncoding() {
+        return null;
+    }
 }

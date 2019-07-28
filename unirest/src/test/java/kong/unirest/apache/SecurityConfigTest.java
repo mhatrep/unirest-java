@@ -26,10 +26,10 @@
 package kong.unirest.apache;
 
 import kong.unirest.Config;
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class SecurityConfigTest {
 

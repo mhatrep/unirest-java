@@ -14,4 +14,4 @@ cache:
 # blocklist
 branches:
   except:
-  - v3
+  - apache5

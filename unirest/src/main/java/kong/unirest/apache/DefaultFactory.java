@@ -27,35 +27,23 @@ package kong.unirest.apache;
 
 import kong.unirest.Config;
 import kong.unirest.HttpRequest;
-import org.apache.http.client.config.RequestConfig;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.client5.http.protocol.HttpClientContext;
+import org.apache.hc.core5.http.protocol.HttpContext;
+import org.apache.hc.core5.util.Timeout;
 
 class DefaultFactory implements RequestConfigFactory {
-    private static boolean isOldApache = false;
     @Override
-    public RequestConfig apply(Config config, HttpRequest request) {
-        RequestConfig.Builder builder = RequestConfig.custom()
-                .setConnectTimeout(request.getConnectTimeout())
-                .setSocketTimeout(request.getSocketTimeout())
-                .setConnectionRequestTimeout(request.getSocketTimeout())
+    public HttpContext apply(Config config, HttpRequest request) {
+        RequestConfig config1 = RequestConfig.custom()
+                .setConnectTimeout(Timeout.ofMilliseconds(request.getConnectTimeout()))
+                // .setSocketTimeout(request.getSocketTimeout())
+                .setConnectionRequestTimeout(Timeout.ofMilliseconds(request.getSocketTimeout()))
                 .setProxy(RequestOptions.toApacheProxy(request.getProxy()))
-                .setCookieSpec(config.getCookieSpec());
-
-        return tryNormalize(builder).build();
-    }
-
-    private RequestConfig.Builder tryNormalize(RequestConfig.Builder builder) {
-        if(isOldApache){
-            return builder;
-        }
-
-        try {
-            return builder.setNormalizeUri(false);
-        }catch (Exception e) {
-            // setNormalizeUri doesnt exist in old version of apache client
-            // the behavior that it does used to just be standard
-            // so remember that we don't care
-            isOldApache = true;
-            return builder;
-        }
+                .setCookieSpec(config.getCookieSpec())
+                .build();
+        HttpClientContext context = new HttpClientContext();
+        context.setRequestConfig(config1);
+        return context;
     }
 }

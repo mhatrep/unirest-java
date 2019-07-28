@@ -25,16 +25,39 @@
 
 package kong.unirest;
 
+import org.apache.hc.core5.http.HttpResponse;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 public abstract class RawResponseBase implements RawResponse {
 
     private static final Pattern CHARSET_PATTERN = Pattern.compile("(?i)\\bcharset=\\s*\"?([^\\s;\"]*)");
+    private HttpResponse r;
     protected Config config;
 
-    protected RawResponseBase(Config config){
+    protected RawResponseBase(org.apache.hc.core5.http.HttpResponse response, Config config){
+        r = response;
         this.config = config;
+    }
+
+    @Override
+    public int getStatus() {
+        return r.getCode();
+    }
+
+    @Override
+    public String getStatusText() {
+        return r.getReasonPhrase();
+    }
+
+    @Override
+    public Headers getHeaders() {
+        Headers h = new Headers();
+        Stream.of(r.getHeaders())
+                .forEachOrdered(e -> h.add(e.getName(), e.getValue()));
+        return h;
     }
 
     protected String getCharSet() {

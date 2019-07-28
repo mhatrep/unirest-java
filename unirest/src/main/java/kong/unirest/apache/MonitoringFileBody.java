@@ -26,8 +26,8 @@
 package kong.unirest.apache;
 
 import kong.unirest.ProgressMonitor;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.mime.content.FileBody;
+import org.apache.hc.client5.http.entity.mime.FileBody;
+import org.apache.hc.core5.http.ContentType;
 
 import java.io.File;
 import java.io.IOException;

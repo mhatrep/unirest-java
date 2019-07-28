@@ -27,8 +27,8 @@ package kong.unirest.apache;
 
 import kong.unirest.ProgressMonitor;
 import kong.unirest.UnirestException;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.mime.content.InputStreamBody;
+import org.apache.hc.client5.http.entity.mime.InputStreamBody;
+import org.apache.hc.core5.http.ContentType;
 
 import java.io.IOException;
 import java.io.InputStream;

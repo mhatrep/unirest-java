@@ -33,28 +33,22 @@ public class ContentTypeTest {
 
     @Test
     public void contentTypeWithEncoding() {
-        verifySame(org.apache.http.entity.ContentType.APPLICATION_ATOM_XML,
+        verifySame(org.apache.hc.core5.http.ContentType.APPLICATION_ATOM_XML,
                 ContentType.APPLICATION_ATOM_XML);
     }
 
     @Test
-    public void imageTypes() {
-        verifySame(org.apache.http.entity.ContentType.IMAGE_GIF,
-                ContentType.IMAGE_GIF);
-    }
-
-    @Test
     public void wildCard() {
-        verifySame(org.apache.http.entity.ContentType.WILDCARD,
+        verifySame(org.apache.hc.core5.http.ContentType.WILDCARD,
                 ContentType.WILDCARD);
     }
 
-    private void verifySame(org.apache.http.entity.ContentType apache, ContentType unirest) {
+    private void verifySame(org.apache.hc.core5.http.ContentType apache, ContentType unirest) {
         assertEquals(
                 apache.toString(),
                 unirest.toString()
         );
         assertEquals(apache.toString(),
-                org.apache.http.entity.ContentType.parse(unirest.toString()).toString());
+                org.apache.hc.core5.http.ContentType.parse(unirest.toString()).toString());
     }
 }

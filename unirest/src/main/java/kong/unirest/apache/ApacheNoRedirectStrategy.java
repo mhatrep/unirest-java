@@ -25,20 +25,23 @@
 
 package kong.unirest.apache;
 
-import org.apache.http.HttpRequest;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.RedirectStrategy;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.protocol.HttpContext;
+import org.apache.hc.client5.http.protocol.RedirectStrategy;
+import org.apache.hc.core5.http.HttpException;
+import org.apache.hc.core5.http.HttpRequest;
+import org.apache.hc.core5.http.HttpResponse;
+import org.apache.hc.core5.http.protocol.HttpContext;
+
+import java.net.URI;
 
 class ApacheNoRedirectStrategy implements RedirectStrategy {
+
     @Override
-    public boolean isRedirected(HttpRequest request, HttpResponse response, HttpContext context) {
-        return false;
+    public URI getLocationURI(HttpRequest request, HttpResponse response, HttpContext context) throws HttpException {
+        return null;
     }
 
     @Override
-    public HttpUriRequest getRedirect(HttpRequest request, HttpResponse response, HttpContext context) {
-        return null;
+    public boolean isRedirected(HttpRequest request, HttpResponse response, HttpContext context) throws HttpException {
+        return false;
     }
 }

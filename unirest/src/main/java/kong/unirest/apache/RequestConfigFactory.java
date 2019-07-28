@@ -27,7 +27,7 @@ package kong.unirest.apache;
 
 import kong.unirest.Config;
 import kong.unirest.HttpRequest;
-import org.apache.http.client.config.RequestConfig;
+import org.apache.hc.client5.http.config.RequestConfig;
 
 import java.util.function.BiFunction;
 

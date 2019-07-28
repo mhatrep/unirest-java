@@ -25,8 +25,8 @@
 
 package BehaviorTests;
 
-import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
-import org.apache.http.nio.client.HttpAsyncClient;
+import org.apache.hc.client5.http.async.HttpAsyncClient;
+import org.apache.hc.client5.http.impl.async.CloseableHttpAsyncClient;
 import org.json.JSONObject;
 import org.junit.Ignore;
 import kong.unirest.Unirest;
@@ -37,9 +37,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.IntStream;
 
-import static junit.framework.TestCase.assertNotSame;
-import static junit.framework.TestCase.assertSame;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertSame;
 
 public class DefectTest extends BddTest {
 

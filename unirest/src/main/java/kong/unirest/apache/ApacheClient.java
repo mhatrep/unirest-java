@@ -26,12 +26,13 @@
 package kong.unirest.apache;
 
 import kong.unirest.*;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpRequestBase;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.apache.hc.client5.http.classic.HttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
+import org.apache.hc.core5.http.ClassicHttpRequest;
 
 import java.io.Closeable;
 import java.util.Objects;
@@ -40,7 +41,7 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 
 public class ApacheClient extends BaseApacheClient implements Client {
-    private final HttpClient client;
+    private final CloseableHttpClient client;
     private final Config config;
     private final SecurityConfig security;
     private final PoolingHttpClientConnectionManager manager;
@@ -64,16 +65,8 @@ public class ApacheClient extends BaseApacheClient implements Client {
         client = cb.build();
     }
 
-    @Deprecated // Use the builder instead, also, the PoolingHttpClientConnectionManager and SyncIdleConnectionMonitorThread don't get used here anyway
-    public ApacheClient(HttpClient httpClient, Config config, PoolingHttpClientConnectionManager clientManager, SyncIdleConnectionMonitorThread connMonitor) {
-        this.client = httpClient;
-        this.security = new SecurityConfig(config);
-        this.config = config;
-        this.manager = clientManager;
-        this.syncMonitor = connMonitor;
-    }
 
-    public ApacheClient(HttpClient httpClient, Config config){
+    public ApacheClient(CloseableHttpClient httpClient, Config config){
         this.client = httpClient;
         this.config = config;
         this.security = new SecurityConfig(config);
@@ -81,7 +74,14 @@ public class ApacheClient extends BaseApacheClient implements Client {
         this.syncMonitor = null;
     }
 
-
+    @Deprecated
+    public ApacheClient(CloseableHttpClient httpClient, Config config, PoolingHttpClientConnectionManager clientManager, SyncIdleConnectionMonitorThread connMonitor) {
+        this.client = httpClient;
+        this.security = new SecurityConfig(config);
+        this.config = config;
+        this.manager = clientManager;
+        this.syncMonitor = connMonitor;
+    }
 
 
     private void setOptions(HttpClientBuilder cb) {
@@ -101,7 +101,7 @@ public class ApacheClient extends BaseApacheClient implements Client {
         if (!config.getEnabledCookieManagement()) {
             cb.disableCookieManagement();
         }
-        config.getInterceptors().stream().forEach(cb::addInterceptorFirst);
+        config.getInterceptors().stream().forEach(cb::addRequestInterceptorFirst);
         if (config.shouldAddShutdownHook()) {
             registerShutdownHook();
         }
@@ -119,20 +119,16 @@ public class ApacheClient extends BaseApacheClient implements Client {
     @Override
     public <T> HttpResponse<T> request(HttpRequest request, Function<RawResponse, HttpResponse<T>> transformer) {
 
-        HttpRequestBase requestObj = new RequestPrep(request, config, false).prepare(configFactory);
+        ClassicHttpRequest requestObj = new RequestPrep(request, config, false).prepare(configFactory);
         MetricContext metric = config.getMetric().begin(request.toSummary());
-        try {
-            org.apache.http.HttpResponse execute = client.execute(requestObj);
+        try(CloseableHttpResponse execute = client.execute(requestObj)) {
             ApacheResponse t = new ApacheResponse(execute, config);
             metric.complete(t.toSummary(), null);
             HttpResponse<T> httpResponse = transformBody(transformer, t);
-            requestObj.releaseConnection();
             return httpResponse;
         } catch (Exception e) {
             metric.complete(null, e);
             throw new UnirestException(e);
-        } finally {
-            requestObj.releaseConnection();
         }
     }
 
@@ -160,16 +156,16 @@ public class ApacheClient extends BaseApacheClient implements Client {
         );
     }
 
-    public static Builder builder(HttpClient baseClient) {
+    public static Builder builder(CloseableHttpClient baseClient) {
         return new Builder(baseClient);
     }
 
     public static class Builder implements Function<Config, Client> {
 
-        private HttpClient baseClient;
+        private CloseableHttpClient baseClient;
         private RequestConfigFactory configFactory;
 
-        public Builder(HttpClient baseClient) {
+        public Builder(CloseableHttpClient baseClient) {
             this.baseClient = baseClient;
         }
 
