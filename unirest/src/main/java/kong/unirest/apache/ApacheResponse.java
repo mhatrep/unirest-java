@@ -26,12 +26,10 @@
 package kong.unirest.apache;
 
 import kong.unirest.Config;
-import kong.unirest.Header;
 import kong.unirest.RawResponseBase;
 import kong.unirest.UnirestException;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.apache.hc.core5.http.HttpEntity;
-import org.apache.hc.core5.http.HttpResponse;
 
 import java.io.*;
 import java.util.zip.GZIPInputStream;

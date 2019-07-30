@@ -26,10 +26,8 @@
 package kong.unirest.apache;
 
 import kong.unirest.Config;
-import kong.unirest.Headers;
 import kong.unirest.RawResponseBase;
 import org.apache.hc.client5.http.async.methods.SimpleHttpResponse;
-import org.apache.hc.core5.http.HttpResponse;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;

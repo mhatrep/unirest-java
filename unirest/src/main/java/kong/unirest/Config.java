@@ -27,8 +27,6 @@ package kong.unirest;
 
 import kong.unirest.apache.ApacheAsyncClient;
 import kong.unirest.apache.ApacheClient;
-import org.apache.hc.client5.http.async.HttpAsyncClient;
-import org.apache.hc.client5.http.classic.HttpClient;
 import org.apache.hc.core5.http.HttpRequestInterceptor;
 
 import java.io.InputStream;

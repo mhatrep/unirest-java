@@ -25,11 +25,10 @@
 
 package kong.unirest.apache;
 
-import java.util.concurrent.TimeUnit;
-
 import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
-import org.apache.hc.client5.http.io.HttpClientConnectionManager;
 import org.apache.hc.core5.util.TimeValue;
+
+import java.util.concurrent.TimeUnit;
 
 public class SyncIdleConnectionMonitorThread extends Thread {
 

@@ -25,15 +25,16 @@
 
 package kong.unirest.apache;
 
-import kong.unirest.*;
+import kong.unirest.Config;
+import kong.unirest.HttpMethod;
+import kong.unirest.HttpRequest;
+import kong.unirest.UnirestException;
 import org.apache.hc.client5.http.async.methods.SimpleHttpRequest;
 import org.apache.hc.client5.http.classic.methods.*;
 import org.apache.hc.core5.http.ClassicHttpRequest;
 import org.apache.hc.core5.http.HttpEntity;
 import org.apache.hc.core5.http.message.BasicHeader;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
@@ -104,21 +105,7 @@ class RequestPrep {
         if (request.getBody().isPresent()) {
             ApacheBodyMapper mapper = new ApacheBodyMapper(request);
             HttpEntity entity = mapper.apply();
-            if (async) {
-                if (reqObj.getHeaders(CONTENT_TYPE) == null || reqObj.getHeaders(CONTENT_TYPE).length == 0) {
-                    reqObj.setHeader("Content-Type", entity.getContentType());
-                }
-                try {
-                    ByteArrayOutputStream output = new ByteArrayOutputStream();
-                    entity.writeTo(output);
-//                    NByteArrayEntity en = new NByteArrayEntity(output.toByteArray());
-//                    ((HttpEntityEnclosingRequestBase) reqObj).setEntity(en);
-                } catch (IOException e) {
-                    throw new UnirestException(e);
-                }
-            } else {
-               // ((HttpEntityEnclosingRequestBase) reqObj).setEntity(entity);
-            }
+            reqObj.setEntity(entity);
         }
     }
 
