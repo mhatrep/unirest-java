@@ -37,6 +37,7 @@ import org.apache.hc.core5.concurrent.FutureCallback;
 import org.apache.hc.core5.http.config.Registry;
 import org.apache.hc.core5.http.config.RegistryBuilder;
 import org.apache.hc.core5.http.nio.ssl.TlsStrategy;
+import org.apache.hc.core5.http.protocol.HttpContext;
 import org.apache.hc.core5.pool.PoolConcurrencyPolicy;
 import org.apache.hc.core5.pool.PoolReusePolicy;
 import org.apache.hc.core5.reactor.IOReactorStatus;
@@ -177,14 +178,17 @@ public class ApacheAsyncClient extends BaseApacheClient implements AsyncClient {
 
         Objects.requireNonNull(callback);
 
-        SimpleHttpRequest requestObj = new RequestPrep(request, config, true).prepareSimple(configFactory);
+        SimpleHttpRequest requestObj = new RequestPrep(request, config, true).prepareSimple();
         MetricContext metric = config.getMetric().begin(request.toSummary());
-        client.execute(requestObj, new FutureCallback<SimpleHttpResponse>() {
+        HttpContext context = configFactory.apply(config, request);
+
+        client.execute(requestObj, context, new FutureCallback<SimpleHttpResponse>() {
             @Override
             public void completed(SimpleHttpResponse httpResponse) {
                 ApacheAsyncResponse t = new ApacheAsyncResponse(httpResponse, config);
                 metric.complete(t.toSummary(), null);
-                callback.complete(transformBody(transformer, t));
+                HttpResponse<T> value = transformBody(transformer, t);
+                callback.complete(value);
             }
 
             @Override

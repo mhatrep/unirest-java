@@ -56,7 +56,7 @@ public class MockServer {
 	private static Object responseBody;
 	public static final int PORT = 4567;
 	public static final String HOST = "http://localhost:" + PORT;
-	public static final String WINDOWS_LATIN_1_FILE = HOST + "data/cp1250.txt";
+	public static final String WINDOWS_LATIN_1_FILE = HOST + "/cp1250.txt";
 	public static final String REDIRECT = HOST + "/redirect";
 	public static final String SPARKLE = HOST + "/sparkle/{spark}/yippy";
 	public static final String BINARYFILE = HOST + "/binary";

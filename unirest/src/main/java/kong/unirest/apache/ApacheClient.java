@@ -33,6 +33,7 @@ import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
 import org.apache.hc.core5.http.ClassicHttpRequest;
+import org.apache.hc.core5.http.protocol.HttpContext;
 
 import java.io.Closeable;
 import java.util.Objects;
@@ -119,9 +120,10 @@ public class ApacheClient extends BaseApacheClient implements Client {
     @Override
     public <T> HttpResponse<T> request(HttpRequest request, Function<RawResponse, HttpResponse<T>> transformer) {
 
-        ClassicHttpRequest requestObj = new RequestPrep(request, config, false).prepare(configFactory);
+        ClassicHttpRequest requestObj = new RequestPrep(request, config, false).prepare();
         MetricContext metric = config.getMetric().begin(request.toSummary());
-        try(CloseableHttpResponse execute = client.execute(requestObj)) {
+        HttpContext context = configFactory.apply(config, request);
+        try(CloseableHttpResponse execute = client.execute(requestObj, context)) {
             ApacheResponse t = new ApacheResponse(execute, config);
             metric.complete(t.toSummary(), null);
             HttpResponse<T> httpResponse = transformBody(transformer, t);

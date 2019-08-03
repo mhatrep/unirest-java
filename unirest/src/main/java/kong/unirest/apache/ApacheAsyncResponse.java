@@ -29,6 +29,7 @@ import kong.unirest.Config;
 import kong.unirest.RawResponseBase;
 import org.apache.hc.client5.http.async.methods.SimpleHttpResponse;
 
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
@@ -43,22 +44,22 @@ class ApacheAsyncResponse extends RawResponseBase {
 
     @Override
     public InputStream getContent() {
-        return null;
+        return new ByteArrayInputStream(r.getBodyBytes());
     }
 
     @Override
     public byte[] getContentAsBytes() {
-        return new byte[0];
+        return r.getBodyBytes();
     }
 
     @Override
     public String getContentAsString() {
-        return null;
+        return r.getBodyText();
     }
 
     @Override
     public String getContentAsString(String charset) {
-        return null;
+        return r.getBodyText();
     }
 
     @Override
@@ -68,12 +69,12 @@ class ApacheAsyncResponse extends RawResponseBase {
 
     @Override
     public boolean hasContent() {
-        return false;
+        return r.getBodyBytes().length > 0;
     }
 
     @Override
     public String getContentType() {
-        return null;
+        return r.getContentType().getMimeType();
     }
 
     @Override

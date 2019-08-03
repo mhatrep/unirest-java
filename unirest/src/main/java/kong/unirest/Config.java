@@ -27,6 +27,7 @@ package kong.unirest;
 
 import kong.unirest.apache.ApacheAsyncClient;
 import kong.unirest.apache.ApacheClient;
+import org.apache.hc.client5.http.impl.async.CloseableHttpAsyncClient;
 import org.apache.hc.core5.http.HttpRequestInterceptor;
 
 import java.io.InputStream;
@@ -708,4 +709,7 @@ public class Config {
     }
 
 
+    public void asyncClient(CloseableHttpAsyncClient c) {
+        this.asyncClient = Optional.of(new ApacheAsyncClient(c,this));
+    }
 }

@@ -123,7 +123,8 @@ public class AsStringTest extends BddTest {
     public void canSetExpectedCharsetOfResponse() {
         assertEquals("šžýáíé", Unirest.get(MockServer.WINDOWS_LATIN_1_FILE)
                 .responseEncoding("windows-1250")
-                .asString().getBody());
+                .asString()
+                .getBody());
     }
 
     @Test

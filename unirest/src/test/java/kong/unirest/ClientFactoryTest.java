@@ -55,12 +55,12 @@ public class ClientFactoryTest {
     @Test
     public void canSaveSomeOptions(){
         HttpRequestInterceptor i = mock(HttpRequestInterceptor.class);
-        CloseableHttpAsyncClient c = mock(CloseableHttpAsyncClient.class);
+        AsyncClient c = mock(AsyncClient.class);
 
-//        Unirest.config()
-//                .addInterceptor(i)
-//                .connectTimeout(4000)
-//                .asyncClient(c);
+        Unirest.config()
+                .addInterceptor(i)
+                .connectTimeout(4000)
+                .asyncClient(c);
 
         Unirest.shutDown(false);
 

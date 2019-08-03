@@ -90,8 +90,8 @@ public class ConfigTest {
 
     @Test
     public void onceTheConfigIsRunningYouCannotChangeConfig(){
-      //  config.httpClient(mock(HttpClient.class));
-        //config.asyncClient(mock(HttpAsyncClient.class));
+        config.httpClient(mock(Client.class));
+        config.asyncClient(mock(AsyncClient.class));
 
         TestUtil.assertException(() -> config.socketTimeout(533),
                 UnirestConfigException.class,
@@ -104,8 +104,9 @@ public class ConfigTest {
 
     @Test
     public void willNotRebuildIfNotClosableAsyncClient() {
-        HttpAsyncClient c = mock(HttpAsyncClient.class);
-        //config.asyncClient(c);
+        CloseableHttpAsyncClient c = mock(CloseableHttpAsyncClient.class);
+        when(c.getStatus()).thenReturn(IOReactorStatus.ACTIVE);
+        config.asyncClient(c);
 
         assertSame(c, config.getAsyncClient().getClient());
         assertSame(c, config.getAsyncClient().getClient());
@@ -129,9 +130,9 @@ public class ConfigTest {
     public void testShutdown() throws IOException {
         when(asyncClient.getStatus()).thenReturn(IOReactorStatus.ACTIVE);
 
-//        Unirest.config()
-//                .httpClient(new ApacheClient(httpc, null, clientManager, connMonitor))
-//                .asyncClient(new ApacheAsyncClient(asyncClient, null, manager, asyncMonitor));
+        Unirest.config()
+                .httpClient(new ApacheClient(httpc, null, clientManager, connMonitor))
+                .asyncClient(new ApacheAsyncClient(asyncClient, null, manager, asyncMonitor));
 
         Unirest.shutDown();
 
@@ -205,15 +206,6 @@ public class ConfigTest {
                 "Attempted to get a new async client but it was not started. Please ensure it is");
     }
 
-    @Test
-    public void willNotRebuildIfRunning() {
-        CloseableHttpAsyncClient c = mock(CloseableHttpAsyncClient.class);
-        when(c.getStatus()).thenReturn(IOReactorStatus.ACTIVE);
-
-        //config.asyncClient(c);
-
-        assertSame(c, config.getAsyncClient().getClient());
-    }
 
     @Test
     public void provideYourOwnClientBuilder() {

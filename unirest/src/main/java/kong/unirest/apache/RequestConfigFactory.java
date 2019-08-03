@@ -27,10 +27,10 @@ package kong.unirest.apache;
 
 import kong.unirest.Config;
 import kong.unirest.HttpRequest;
-import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.core5.http.protocol.HttpContext;
 
 import java.util.function.BiFunction;
 
 @FunctionalInterface
-public interface RequestConfigFactory extends BiFunction<Config, HttpRequest, RequestConfig> {
+public interface RequestConfigFactory extends BiFunction<Config, HttpRequest, HttpContext> {
 }

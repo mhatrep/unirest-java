@@ -66,15 +66,15 @@ class RequestPrep {
         this.async = async;
     }
 
-    ClassicHttpRequest prepare(RequestConfigFactory configFactory) {
-        ClassicHttpRequest reqObj = getHttpRequestBase(configFactory);
+    ClassicHttpRequest prepare() {
+        ClassicHttpRequest reqObj = getHttpRequestBase();
 
         setBody(reqObj);
 
         return reqObj;
     }
 
-    private ClassicHttpRequest getHttpRequestBase(RequestConfigFactory configFactory) {
+    private ClassicHttpRequest getHttpRequestBase() {
         if (!request.getHeaders().containsKey(USER_AGENT_HEADER)) {
             request.header(USER_AGENT_HEADER, USER_AGENT);
         }
@@ -109,7 +109,7 @@ class RequestPrep {
         }
     }
 
-    public SimpleHttpRequest prepareSimple(RequestConfigFactory configFactory) {
+    public SimpleHttpRequest prepareSimple() {
         SimpleHttpRequest r = new SimpleHttpRequest(request.getHttpMethod().name(), request.getUrl());
         request.getHeaders().all().stream().map(this::toEntries).forEach(r::addHeader);
         return r;

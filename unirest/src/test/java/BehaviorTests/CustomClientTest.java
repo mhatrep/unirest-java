@@ -31,6 +31,7 @@ import kong.unirest.apache.ApacheAsyncClient;
 import org.apache.hc.client5.http.config.RequestConfig;
 import org.apache.hc.client5.http.impl.async.CloseableHttpAsyncClient;
 import org.apache.hc.client5.http.impl.async.HttpAsyncClientBuilder;
+import org.apache.hc.client5.http.protocol.HttpClientContext;
 import org.junit.After;
 import org.junit.Test;
 
@@ -86,7 +87,7 @@ public class CustomClientTest extends BddTest {
             Unirest.config().asyncClient(ApacheAsyncClient.builder(client)
                     .withRequestConfig((c, w) -> {
                         requestConfigUsed = true;
-                        return RequestConfig.custom().build();
+                        return new HttpClientContext();
                     })
             );
 
