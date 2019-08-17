@@ -27,6 +27,11 @@ package BehaviorTests;
 
 import kong.unirest.HttpRequestSummary;
 import kong.unirest.Unirest;
+import kong.unirest.apache.ApacheClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.core5.http.ClassicHttpRequest;
+import org.apache.hc.core5.http.protocol.HttpContext;
+import org.hamcrest.Matchers;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -127,10 +132,14 @@ public class MetricsTest extends BddTest {
 
     @Test
     public void errorHandling() throws Exception {
-        //HttpClient mock = mock(HttpClient.class);
-       // when(mock.execute(any(HttpRequestBase.class))).thenThrow(new RuntimeException("boo"));
+        CloseableHttpClient mock = mock(CloseableHttpClient.class);
+        when(mock.execute(any(ClassicHttpRequest.class), any(HttpContext.class))).thenThrow(new RuntimeException("boo"));
         MyMetric metric = new MyMetric(HttpRequestSummary::getUrl);
-        //Unirest.config().reset().httpClient(mock).instrumentWith(metric);
+
+        Unirest.config()
+                .reset()
+                .httpClient(ApacheClient.builder(mock))
+                .instrumentWith(metric);
 
         try {
             Unirest.get(GET).asEmpty();

@@ -27,7 +27,7 @@ package kong.unirest;
 
 class UniByteArrayBody extends BodyPart {
     UniByteArrayBody(byte[] bodyBytes) {
-        super(bodyBytes, null, null);
+        super(bodyBytes, null, ContentType.TEXT_PLAIN.getMimeType());
     }
 
     @Override

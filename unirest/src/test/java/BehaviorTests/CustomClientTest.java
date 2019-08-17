@@ -28,53 +28,50 @@ package BehaviorTests;
 import kong.unirest.HttpResponse;
 import kong.unirest.Unirest;
 import kong.unirest.apache.ApacheAsyncClient;
+import kong.unirest.apache.ApacheClient;
 import org.apache.hc.client5.http.config.RequestConfig;
 import org.apache.hc.client5.http.impl.async.CloseableHttpAsyncClient;
 import org.apache.hc.client5.http.impl.async.HttpAsyncClientBuilder;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.client5.http.protocol.HttpClientContext;
+import org.apache.hc.core5.http.protocol.BasicHttpContext;
+import org.apache.hc.core5.http.protocol.HttpContext;
 import org.junit.After;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
 
 public class CustomClientTest extends BddTest {
 
-    private final String url = "http://localhost/getme";
+    private final String url = MockServer.GET;
     boolean requestConfigUsed = false;
 
+    @Override
+    public void setUp() {
+        super.setUp();
+        MockServer.setStringResponse("Howdy Ho!");
+    }
 
     @Override
     @After
     public void tearDown() {
         super.tearDown();
         requestConfigUsed = false;
-
-
     }
 
-    @Test
-    public void settingACustomClient() {
-      //  HttpClientMock client = getMockClient();
-
-       // Unirest.config().httpClient(client);
-
-        assertMockResult();
-    }
 
     @Test
     public void settingACustomClientWithBuilder() {
-      //  HttpClientMock client = getMockClient();
+        CloseableHttpClient client = HttpClients.custom().build();
 
-//        Unirest.config().httpClient(ApacheClient.builder(client)
-//                .withRequestConfig((c, w) -> {
-//                    requestConfigUsed = true;
-//                    return RequestConfig.custom().build();
-//                }));
-
-        assertMockResult();
-
-        Unirest.config().reset();
+        Unirest.config().httpClient(ApacheClient.builder(client)
+                .withRequestConfig((c, w) -> {
+                    requestConfigUsed = true;
+                    return new BasicHttpContext();
+                }));
 
         assertMockResult();
     }
@@ -97,7 +94,6 @@ public class CustomClientTest extends BddTest {
     }
 
     private void assertAsyncResult() throws Exception {
-        MockServer.setStringResponse("Howdy Ho!");
         HttpResponse<String> result =  Unirest.get(MockServer.GET).asStringAsync().get();
         assertEquals(200, result.getStatus());
         assertEquals("Howdy Ho!", result.getBody());
@@ -106,7 +102,7 @@ public class CustomClientTest extends BddTest {
 
     private void assertMockResult() {
         HttpResponse<String> result =  Unirest.get(url).asString();
-        assertEquals(202, result.getStatus());
+        assertEquals(200, result.getStatus());
         assertEquals("Howdy Ho!", result.getBody());
     }
 }

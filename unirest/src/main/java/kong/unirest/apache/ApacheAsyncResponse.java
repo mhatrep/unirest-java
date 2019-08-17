@@ -64,7 +64,7 @@ class ApacheAsyncResponse extends RawResponseBase {
 
     @Override
     public InputStreamReader getContentReader() {
-        return null;
+        return new InputStreamReader(getContent());
     }
 
     @Override
