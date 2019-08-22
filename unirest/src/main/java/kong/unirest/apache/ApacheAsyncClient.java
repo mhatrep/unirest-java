@@ -29,6 +29,7 @@ import kong.unirest.*;
 import org.apache.hc.client5.http.async.HttpAsyncClient;
 import org.apache.hc.client5.http.async.methods.SimpleHttpRequest;
 import org.apache.hc.client5.http.async.methods.SimpleHttpResponse;
+import org.apache.hc.client5.http.async.methods.SimpleResponseConsumer;
 import org.apache.hc.client5.http.impl.async.CloseableHttpAsyncClient;
 import org.apache.hc.client5.http.impl.async.HttpAsyncClientBuilder;
 import org.apache.hc.client5.http.impl.nio.PoolingAsyncClientConnectionManager;
@@ -36,6 +37,9 @@ import org.apache.hc.client5.http.ssl.DefaultClientTlsStrategy;
 import org.apache.hc.core5.concurrent.FutureCallback;
 import org.apache.hc.core5.http.config.Registry;
 import org.apache.hc.core5.http.config.RegistryBuilder;
+import org.apache.hc.core5.http.nio.AsyncEntityProducer;
+import org.apache.hc.core5.http.nio.AsyncRequestProducer;
+import org.apache.hc.core5.http.nio.AsyncResponseConsumer;
 import org.apache.hc.core5.http.nio.ssl.TlsStrategy;
 import org.apache.hc.core5.http.protocol.HttpContext;
 import org.apache.hc.core5.pool.PoolConcurrencyPolicy;
@@ -178,10 +182,47 @@ public class ApacheAsyncClient extends BaseApacheClient implements AsyncClient {
 
         Objects.requireNonNull(callback);
 
-        SimpleHttpRequest requestObj = new RequestPrep(request, config, true).prepareSimple();
         MetricContext metric = config.getMetric().begin(request.toSummary());
         HttpContext context = configFactory.apply(config, request);
 
+        if(request.getBody().isPresent()){
+            return request(request, transformer, callback, metric, context);
+        } else {
+            return requestSimple(request, transformer, callback, metric, context);
+        }
+    }
+
+    private <T> CompletableFuture<HttpResponse<T>> request(HttpRequest request, Function<RawResponse, HttpResponse<T>> transformer, CompletableFuture<HttpResponse<T>> callback, MetricContext metric, HttpContext context) {
+        AsyncEntityProducerFactory factory = new AsyncEntityProducerFactory();
+        AsyncRequestProducer apply = factory.apply(request);
+
+        client.execute(apply, SimpleResponseConsumer.create(), new FutureCallback<SimpleHttpResponse>() {
+            @Override
+            public void completed(SimpleHttpResponse httpResponse) {
+                ApacheAsyncResponse t = new ApacheAsyncResponse(httpResponse, config);
+                metric.complete(t.toSummary(), null);
+                HttpResponse<T> value = transformBody(transformer, t);
+                callback.complete(value);
+            }
+
+            @Override
+            public void failed(Exception e) {
+                metric.complete(null, e);
+                callback.completeExceptionally(e);
+            }
+
+            @Override
+            public void cancelled() {
+                UnirestException canceled = new UnirestException("canceled");
+                metric.complete(null, canceled);
+                callback.completeExceptionally(canceled);
+            }
+        });
+        return callback;
+    }
+
+    private <T> CompletableFuture<HttpResponse<T>> requestSimple(HttpRequest request, Function<RawResponse, HttpResponse<T>> transformer, CompletableFuture<HttpResponse<T>> callback, MetricContext metric, HttpContext context) {
+        SimpleHttpRequest requestObj = new RequestPrep(request, config, true).prepareSimple();
         client.execute(requestObj, context, new FutureCallback<SimpleHttpResponse>() {
             @Override
             public void completed(SimpleHttpResponse httpResponse) {

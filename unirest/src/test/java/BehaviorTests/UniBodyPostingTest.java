@@ -1,8 +1,8 @@
 /**
  * The MIT License
- *
+ * <p>
  * Copyright for portions of unirest-java are held by Kong Inc (c) 2013.
- *
+ * <p>
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
  * "Software"), to deal in the Software without restriction, including
@@ -10,10 +10,10 @@
  * distribute, sublicense, and/or sell copies of the Software, and to
  * permit persons to whom the Software is furnished to do so, subject to
  * the following conditions:
- *
+ * <p>
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- *
+ * <p>
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
  * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -39,7 +39,7 @@ import static kong.unirest.TestUtil.assertException;
 
 public class UniBodyPostingTest extends BddTest {
     @Test
-    public void testDefaults_String(){
+    public void testDefaults_String() {
         Unirest.post(MockServer.POST)
                 .body("foo")
                 .asObject(RequestCapture.class)
@@ -48,7 +48,7 @@ public class UniBodyPostingTest extends BddTest {
     }
 
     @Test
-    public void canSetCharsetOfBody(){
+    public void canSetCharsetOfBody() {
         Unirest.post(MockServer.POST)
                 .charset(StandardCharsets.US_ASCII)
                 .body("foo")
@@ -60,7 +60,7 @@ public class UniBodyPostingTest extends BddTest {
     }
 
     @Test
-    public void canSetCharsetOfBodyAfterMovingToBody(){
+    public void canSetCharsetOfBodyAfterMovingToBody() {
         Unirest.post(MockServer.POST)
                 .body("foo")
                 .charset(StandardCharsets.US_ASCII)
@@ -85,13 +85,16 @@ public class UniBodyPostingTest extends BddTest {
 
     @Test
     public void testAsyncCustomContentType() {
+
         Unirest.post(MockServer.POST)
                 .header("accept", "application/json")
                 .header("Content-Type", "application/json")
                 .body("{\"hello\":\"world\"}")
-                .asJsonAsync(new MockCallback<>(this, r -> parse(r)
-                        .asserBody("{\"hello\":\"world\"}")
-                        .assertHeader("Content-Type", "application/json"))
+                .asJsonAsync(new MockCallback<>(this, r -> {
+                            RequestCapture parse = parse(r);
+                            parse.asserBody("{\"hello\":\"world\"}")
+                                    .assertHeader("Content-Type", "application/json");
+                        })
                 );
 
         assertAsync();
@@ -125,7 +128,7 @@ public class UniBodyPostingTest extends BddTest {
     @Test
     public void postBodyAsJson() {
         JSONObject body = new JSONObject();
-        body.put("krusty","krab");
+        body.put("krusty", "krab");
 
         Unirest.post(MockServer.POST)
                 .body(body)
@@ -159,7 +162,7 @@ public class UniBodyPostingTest extends BddTest {
     }
 
     @Test
-    public void cantPostObjectWithoutObjectMapper(){
+    public void cantPostObjectWithoutObjectMapper() {
         Unirest.config().setObjectMapper(null);
 
         assertException(() -> Unirest.post(MockServer.POST).body(new Foo("die")),

@@ -25,10 +25,8 @@
 
 package kong.unirest.apache;
 
-import kong.unirest.Config;
-import kong.unirest.HttpMethod;
-import kong.unirest.HttpRequest;
-import kong.unirest.UnirestException;
+import kong.unirest.*;
+import org.apache.hc.client5.http.async.methods.SimpleBody;
 import org.apache.hc.client5.http.async.methods.SimpleHttpRequest;
 import org.apache.hc.client5.http.classic.methods.*;
 import org.apache.hc.core5.http.ClassicHttpRequest;
@@ -37,6 +35,7 @@ import org.apache.hc.core5.http.message.BasicHeader;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 
 class RequestPrep {
@@ -114,4 +113,6 @@ class RequestPrep {
         request.getHeaders().all().stream().map(this::toEntries).forEach(r::addHeader);
         return r;
     }
+
+
 }
