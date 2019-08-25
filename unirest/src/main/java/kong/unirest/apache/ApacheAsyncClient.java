@@ -37,9 +37,7 @@ import org.apache.hc.client5.http.ssl.DefaultClientTlsStrategy;
 import org.apache.hc.core5.concurrent.FutureCallback;
 import org.apache.hc.core5.http.config.Registry;
 import org.apache.hc.core5.http.config.RegistryBuilder;
-import org.apache.hc.core5.http.nio.AsyncEntityProducer;
 import org.apache.hc.core5.http.nio.AsyncRequestProducer;
-import org.apache.hc.core5.http.nio.AsyncResponseConsumer;
 import org.apache.hc.core5.http.nio.ssl.TlsStrategy;
 import org.apache.hc.core5.http.protocol.HttpContext;
 import org.apache.hc.core5.pool.PoolConcurrencyPolicy;
@@ -192,7 +190,11 @@ public class ApacheAsyncClient extends BaseApacheClient implements AsyncClient {
         }
     }
 
-    private <T> CompletableFuture<HttpResponse<T>> request(HttpRequest request, Function<RawResponse, HttpResponse<T>> transformer, CompletableFuture<HttpResponse<T>> callback, MetricContext metric, HttpContext context) {
+    private <T> CompletableFuture<HttpResponse<T>> request(HttpRequest request,
+                                                           Function<RawResponse, HttpResponse<T>> transformer,
+                                                           CompletableFuture<HttpResponse<T>> callback,
+                                                           MetricContext metric,
+                                                           HttpContext context) {
         AsyncEntityProducerFactory factory = new AsyncEntityProducerFactory();
         AsyncRequestProducer apply = factory.apply(request);
 
@@ -221,7 +223,11 @@ public class ApacheAsyncClient extends BaseApacheClient implements AsyncClient {
         return callback;
     }
 
-    private <T> CompletableFuture<HttpResponse<T>> requestSimple(HttpRequest request, Function<RawResponse, HttpResponse<T>> transformer, CompletableFuture<HttpResponse<T>> callback, MetricContext metric, HttpContext context) {
+    private <T> CompletableFuture<HttpResponse<T>> requestSimple(HttpRequest request,
+                                                                 Function<RawResponse, HttpResponse<T>> transformer,
+                                                                 CompletableFuture<HttpResponse<T>> callback,
+                                                                 MetricContext metric,
+                                                                 HttpContext context) {
         SimpleHttpRequest requestObj = new RequestPrep(request, config, true).prepareSimple();
         client.execute(requestObj, context, new FutureCallback<SimpleHttpResponse>() {
             @Override
